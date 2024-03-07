@@ -5,11 +5,9 @@ First clone the repository.
 ```bash
 git clone https://github.com/asifrahaman13/student-management-
 ```
-Next enter into the backend folder 
 
-```bash
-cd backend/
-```
+Now change the example.env to .env file.
+
 
 Next build and run the application.
 
