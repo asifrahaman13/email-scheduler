@@ -1,11 +1,16 @@
 package operations
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-
+	"log"
 	"net/http"
+	"os"
+	"github.com/asifrahaman13/event_management/models"
+	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
@@ -15,25 +20,46 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 func Helloworld() {
 	fmt.Println("Hello World")
 }
+var client *mongo.Client
+
+
 
 func InsertEmail(w http.ResponseWriter, r *http.Request) {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file is specified.")
+	}
 
-	// Print the body of the post request endpoint.
+	uri := os.Getenv("MONGODB_URI")
+	if uri == "" {
+		log.Fatal("You must set your 'MONGODB_URI' environment variable. See\n\t https://www.mongodb.com/docs/drivers/go/current/usage-examples/#environment-variable")
+	}
 
-	body, err := io.ReadAll(r.Body)
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
-		http.Error(w, "Error reading request body", http.StatusInternalServerError)
+		log.Fatalf("Error connecting to MongoDB: %s", err)
+	}
+	defer func() {
+		if err := client.Disconnect(context.TODO()); err != nil {
+			log.Fatalf("Error disconnecting from MongoDB: %s", err)
+		}
+	}()
+
+	coll := client.Database("email_scheduling").Collection("emails")
+
+	var email models.EmailStruct
+	err = json.NewDecoder(r.Body).Decode(&email)
+	if err != nil {
+		http.Error(w, "Error decoding request body", http.StatusInternalServerError)
 		return
 	}
-    
-	// json.Marshal will convert the golang data type into the JSON representation. 
-	jsonBody, err:=json.Marshal(string(body))
 
+	result, err := coll.InsertOne(context.TODO(), &email)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Error inserting email: %s", err)
 	}
 
-	fmt.Printf("The json is: %s\n", jsonBody)
+	log.Printf("Inserted a single document with ID %s", result.InsertedID)
 
-	fmt.Fprintf(w, "Email Inserted and the body is: %s\n", string(body))
+	fmt.Fprintf(w, "Email Inserted: %+v\n", email)
 }
+

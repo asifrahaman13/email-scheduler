@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/asifrahaman13/event_management/operations"
-    "github.com/asifrahaman13/event_management/connection"
+  
 	"log"
 	"net/http"
 )
@@ -11,7 +11,7 @@ import (
 func main() {
 
     // Initialize the connection function to connect to teh mongodb database. 
-    connection.Connection()
+  
 
 	http.HandleFunc("/", operations.HandleRequest)
 
