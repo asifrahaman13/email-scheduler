@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
-	"net/http"
 	"github.com/asifrahaman13/event_management/connection"
 	"github.com/asifrahaman13/event_management/models"
+	"log"
+	"net/http"
 )
 
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
