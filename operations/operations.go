@@ -6,11 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
+	"github.com/asifrahaman13/event_management/connection"
 	"github.com/asifrahaman13/event_management/models"
-	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func HandleRequest(w http.ResponseWriter, r *http.Request) {
@@ -20,21 +17,9 @@ func HandleRequest(w http.ResponseWriter, r *http.Request) {
 func Helloworld() {
 	fmt.Println("Hello World")
 }
-var client *mongo.Client
-
-
 
 func InsertEmail(w http.ResponseWriter, r *http.Request) {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file is specified.")
-	}
-
-	uri := os.Getenv("MONGODB_URI")
-	if uri == "" {
-		log.Fatal("You must set your 'MONGODB_URI' environment variable. See\n\t https://www.mongodb.com/docs/drivers/go/current/usage-examples/#environment-variable")
-	}
-
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	client, err := connection.ConnectToMongoDB()
 	if err != nil {
 		log.Fatalf("Error connecting to MongoDB: %s", err)
 	}
@@ -62,4 +47,3 @@ func InsertEmail(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "Email Inserted: %+v\n", email)
 }
-
