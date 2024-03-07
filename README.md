@@ -3,7 +3,7 @@
 First clone the repository.
 
 ```bash
-git clone https://github.com/asifrahaman13/student-management-
+git clone https://github.com/asifrahaman13/email-scheduler.git
 ```
 
 Now change the example.env to .env file.
